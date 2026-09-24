@@ -142,7 +142,7 @@ export function SalesPage({ onNotify, onSaleCompleted }: SalesPageProps) {
         <p className="mt-2 text-sm text-slate-600">Select products, adjust quantities, and collect the total.</p>
       </div>
 
-      <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
         <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-5 flex items-center justify-between gap-3">
             <div>
