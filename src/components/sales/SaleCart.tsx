@@ -23,8 +23,8 @@ export function SaleCart({
   const itemCount = lines.reduce((sum, line) => sum + line.quantity, 0)
 
   return (
-    <section className="flex min-h-[520px] flex-col rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-200 p-5">
+    <section className="flex min-h-[320px] flex-col rounded-2xl border border-slate-200 bg-white shadow-sm sm:min-h-[420px] xl:min-h-[520px]">
+      <div className="border-b border-slate-200 p-4 sm:p-5">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
             <ShoppingCart size={19} aria-hidden="true" />
@@ -96,7 +96,7 @@ export function SaleCart({
         )}
       </div>
 
-      <div className="border-t border-slate-200 bg-slate-50 p-5">
+      <div className="border-t border-slate-200 bg-slate-50 p-4 sm:p-5">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-slate-600">Total</span>
           <span className="text-2xl font-bold text-slate-900">{formatCurrency(total)}</span>

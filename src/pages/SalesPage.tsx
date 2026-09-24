@@ -138,12 +138,12 @@ export function SalesPage({ onNotify, onSaleCompleted }: SalesPageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">New Sale</h1>
+        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">New Sale</h1>
         <p className="mt-2 text-sm text-slate-600">Select products, adjust quantities, and collect the total.</p>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+        <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
           <div className="mb-5 flex items-center justify-between gap-3">
             <div>
               <h2 className="font-semibold text-slate-900">Products</h2>
@@ -161,7 +161,7 @@ export function SalesPage({ onNotify, onSaleCompleted }: SalesPageProps) {
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               placeholder="Search products..."
-              className="w-full rounded-xl border border-slate-300 bg-slate-50 py-2.5 pl-10 pr-28 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
+              className="w-full rounded-xl border border-slate-300 bg-slate-50 py-2.5 pl-10 pr-28 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-100"
             />
             <button
               type="button"
@@ -194,7 +194,7 @@ export function SalesPage({ onNotify, onSaleCompleted }: SalesPageProps) {
                   className="min-w-0 rounded-xl border border-slate-200 bg-slate-50 p-3 text-left transition hover:border-emerald-300 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <span className="block truncate text-sm font-semibold text-slate-800">{item.name}</span>
-                  <span className="mt-1 block text-xs text-slate-500">
+                  <span className="mt-1 block truncate text-xs text-slate-500">
                     {formatCurrency(item.selling_price)} · {item.stock} left
                   </span>
                 </button>
@@ -203,15 +203,15 @@ export function SalesPage({ onNotify, onSaleCompleted }: SalesPageProps) {
           </div>
 
           {loading ? (
-            <div className="py-16 text-center text-sm text-slate-500">Loading products...</div>
+            <div className="py-10 text-center text-sm text-slate-500 sm:py-16">Loading products...</div>
           ) : debouncedSearchTerm.trim().length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-5 py-16 text-center">
-              <Search size={30} className="mx-auto text-slate-300" aria-hidden="true" />
-              <p className="mt-3 text-sm font-medium text-slate-600">Search for a product to add</p>
-              <p className="mt-1 text-xs text-slate-400">Enter a product name, then use the Add button.</p>
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-5 py-4 text-center sm:py-16">
+              <Search size={30} className="mx-auto hidden text-slate-300 sm:block" aria-hidden="true" />
+              <p className="text-sm font-medium text-slate-600 sm:mt-3">Search for a product to add</p>
+              <p className="mt-1 hidden text-xs text-slate-400 sm:block">Enter a product name, then use the Add button.</p>
             </div>
           ) : !matchedItem ? (
-            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-5 py-16 text-center">
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-5 py-10 text-center sm:py-16">
               <ShoppingBag size={30} className="mx-auto text-slate-300" aria-hidden="true" />
               <p className="mt-3 text-sm font-medium text-slate-600">No products found</p>
               <p className="mt-1 text-xs text-slate-400">Try another search term or add stock first.</p>
