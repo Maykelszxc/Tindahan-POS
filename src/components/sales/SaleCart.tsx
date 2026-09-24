@@ -23,7 +23,7 @@ export function SaleCart({
   const itemCount = lines.reduce((sum, line) => sum + line.quantity, 0)
 
   return (
-    <section className="flex min-h-[320px] flex-col rounded-2xl border border-slate-200 bg-white shadow-sm sm:min-h-[420px] xl:min-h-[520px]">
+    <section className="flex flex-col rounded-2xl border border-slate-200 bg-white shadow-sm xl:min-h-[520px]">
       <div className="border-b border-slate-200 p-4 sm:p-5">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
