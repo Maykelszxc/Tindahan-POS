@@ -40,7 +40,7 @@ export function SaleCart({
 
       <div className="flex-1 space-y-3 overflow-y-auto p-4">
         {lines.length === 0 ? (
-          <div className="flex min-h-64 flex-col items-center justify-center text-center">
+          <div className="flex flex-col items-center justify-center py-10 text-center sm:py-16">
             <ShoppingCart size={30} className="text-slate-300" aria-hidden="true" />
             <p className="mt-3 text-sm font-medium text-slate-600">Your cart is empty</p>
             <p className="mt-1 max-w-48 text-xs text-slate-400">Select an item to start a new sale.</p>
