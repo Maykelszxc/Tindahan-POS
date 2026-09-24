@@ -60,6 +60,12 @@ export async function deleteItem(id: string): Promise<void> {
   const { error } = await supabase.from('items').delete().eq('id', id)
 
   if (error) {
+    if (error.message.toLowerCase().includes('foreign key') || error.message.toLowerCase().includes('violates')) {
+      throw new Error(
+        'Cannot delete this item because it is referenced by existing sales or records. Run the latest supabase/schema.sql migration, then try again.',
+      )
+    }
+
     throw new Error('Unable to delete item. Please try again.')
   }
 }

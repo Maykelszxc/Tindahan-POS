@@ -30,7 +30,7 @@ create table if not exists sales (
 create table if not exists sale_lines (
   id uuid primary key default gen_random_uuid(),
   sale_id uuid not null references sales(id) on delete cascade,
-  item_id uuid not null references items(id),
+  item_id uuid references items(id) on delete set null,
   item_name text not null,
   quantity integer not null,
   unit_price numeric not null,
@@ -69,3 +69,8 @@ create policy "public access" on sale_lines for all using (true) with check (tru
 
 drop policy if exists "public access" on expenses;
 create policy "public access" on expenses for all using (true) with check (true);
+
+-- Migration: run this if sale_lines was created before item_id allowed deleting sold items.
+alter table sale_lines alter column item_id drop not null;
+alter table sale_lines drop constraint if exists sale_lines_item_id_fkey;
+alter table sale_lines add constraint sale_lines_item_id_fkey foreign key (item_id) references items(id) on delete set null;
