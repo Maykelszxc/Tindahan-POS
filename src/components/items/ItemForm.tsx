@@ -22,6 +22,7 @@ type FormErrors = {
   category_id?: string
   buying_price?: string
   profit_margin?: string
+  selling_price?: string
   stock?: string
 }
 
@@ -30,7 +31,20 @@ const initialFormState = {
   name: '',
   buying_price: '',
   profit_margin: '',
+  selling_price: '',
   stock: '',
+}
+
+function computeMargin(buyingPrice: number, sellingPrice: number): number {
+  if (buyingPrice <= 0) {
+    return 0
+  }
+
+  return Number((((sellingPrice - buyingPrice) / buyingPrice) * 100).toFixed(2))
+}
+
+function computeSellingPrice(buyingPrice: number, marginPercent: number): number {
+  return Number((buyingPrice * (1 + marginPercent / 100)).toFixed(2))
 }
 
 export function ItemForm({
@@ -49,21 +63,24 @@ export function ItemForm({
       return
     }
 
+    const buyingPrice = initialValues.buying_price ?? 0
+    const sellingPrice = initialValues.selling_price ?? 0
+
     setForm({
       category_id: initialValues.category_id ?? '',
       name: initialValues.name ?? '',
       buying_price: initialValues.buying_price != null ? String(initialValues.buying_price) : '',
       profit_margin:
-        initialValues.buying_price != null && initialValues.buying_price > 0 && initialValues.selling_price != null
-          ? String(Number((((initialValues.selling_price - initialValues.buying_price) / initialValues.buying_price) * 100).toFixed(2)))
+        initialValues.buying_price != null && initialValues.selling_price != null
+          ? String(computeMargin(buyingPrice, sellingPrice))
           : '0',
+      selling_price: initialValues.selling_price != null ? String(initialValues.selling_price) : '',
       stock: initialValues.stock != null ? String(initialValues.stock) : '',
     })
   }, [initialValues])
 
   const buyingValue = Number(form.buying_price || 0)
-  const marginValue = Number(form.profit_margin || 0)
-  const sellingValue = Number((buyingValue * (1 + marginValue / 100)).toFixed(2))
+  const sellingValue = Number(form.selling_price || 0)
 
   const preview = useMemo(() => {
     const profit = calculateProfit(buyingValue, sellingValue)
@@ -75,11 +92,37 @@ export function ItemForm({
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
 
+  function updateBuyingPrice(value: string) {
+    setForm((current) => {
+      const nextBuyingPrice = Number(value || 0)
+      const nextSellingPrice = computeSellingPrice(nextBuyingPrice, Number(current.profit_margin || 0))
+      return { ...current, buying_price: value, selling_price: String(nextSellingPrice) }
+    })
+    setErrors((current) => ({ ...current, buying_price: undefined }))
+  }
+
+  function updateProfitMargin(value: string) {
+    setForm((current) => {
+      const nextSellingPrice = computeSellingPrice(Number(current.buying_price || 0), Number(value || 0))
+      return { ...current, profit_margin: value, selling_price: String(nextSellingPrice) }
+    })
+    setErrors((current) => ({ ...current, profit_margin: undefined }))
+  }
+
+  function updateSellingPrice(value: string) {
+    setForm((current) => {
+      const nextMargin = computeMargin(Number(current.buying_price || 0), Number(value || 0))
+      return { ...current, selling_price: value, profit_margin: String(nextMargin) }
+    })
+    setErrors((current) => ({ ...current, selling_price: undefined }))
+  }
+
   function validate() {
     const nextErrors: FormErrors = {}
     const trimmedName = form.name.trim()
     const buyingPrice = Number(form.buying_price)
     const profitMargin = Number(form.profit_margin)
+    const sellingPrice = Number(form.selling_price)
     const stock = Number(form.stock)
 
     if (!trimmedName) {
@@ -96,6 +139,10 @@ export function ItemForm({
 
     if (form.profit_margin === '' || Number.isNaN(profitMargin) || profitMargin < 0) {
       nextErrors.profit_margin = 'Profit margin is required and must be 0% or more.'
+    }
+
+    if (form.selling_price === '' || Number.isNaN(sellingPrice) || sellingPrice < 0) {
+      nextErrors.selling_price = 'Selling price is required and must be 0 or more.'
     }
 
     if (form.stock === '' || !Number.isInteger(stock) || stock < 0) {
@@ -117,7 +164,7 @@ export function ItemForm({
       category_id: form.category_id,
       name: form.name.trim(),
       buying_price: Number(form.buying_price),
-      selling_price: Number((Number(form.buying_price) * (1 + Number(form.profit_margin) / 100)).toFixed(2)),
+      selling_price: Number(form.selling_price),
       stock: Number(form.stock),
     })
   }
@@ -159,7 +206,7 @@ export function ItemForm({
         {errors.category_id ? <p className="mt-1 text-xs text-red-600">{errors.category_id}</p> : null}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-3">
         <div>
           <label htmlFor="item-buying" className="mb-1 block text-sm font-medium text-slate-700">
             Buying Price
@@ -171,7 +218,7 @@ export function ItemForm({
             step="0.01"
             inputMode="decimal"
             value={form.buying_price}
-            onChange={(event) => updateField('buying_price', event.target.value)}
+            onChange={(event) => updateBuyingPrice(event.target.value)}
             className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
             placeholder="45.00"
           />
@@ -191,7 +238,7 @@ export function ItemForm({
             step="0.01"
             inputMode="decimal"
             value={form.profit_margin}
-            onChange={(event) => updateField('profit_margin', event.target.value)}
+            onChange={(event) => updateProfitMargin(event.target.value)}
             className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
             placeholder="10"
           />
@@ -199,6 +246,27 @@ export function ItemForm({
             <p className="mt-1 text-xs text-red-600">{errors.profit_margin}</p>
           ) : null}
           <p className="mt-1 text-xs text-slate-500">Added to the buying price.</p>
+        </div>
+
+        <div>
+          <label htmlFor="item-selling" className="mb-1 block text-sm font-medium text-slate-700">
+            Selling Price
+          </label>
+          <input
+            id="item-selling"
+            type="number"
+            min="0"
+            step="0.01"
+            inputMode="decimal"
+            value={form.selling_price}
+            onChange={(event) => updateSellingPrice(event.target.value)}
+            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+            placeholder="50.00"
+          />
+          {errors.selling_price ? (
+            <p className="mt-1 text-xs text-red-600">{errors.selling_price}</p>
+          ) : null}
+          <p className="mt-1 text-xs text-slate-500">Updates the profit margin.</p>
         </div>
       </div>
 
